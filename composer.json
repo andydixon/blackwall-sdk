@@ -1,0 +1,27 @@
+{
+  "name": "dixon/blackwall-auth-sdk",
+  "description": "PHP SDK for integrating with BlackWall OAuth 2.1 and OpenID Connect",
+  "type": "library",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "BlackWall\\Auth\\": "src/Auth/",
+      "BlackWallSDK\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BlackWall\\Auth\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit --colors=always"
+  }
+}
