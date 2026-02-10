@@ -1,8 +1,8 @@
 {
-  "name": "dixon/blackwall-auth-sdk",
+  "name": "andydixon/blackwall-auth-sdk",
   "description": "PHP SDK for integrating with BlackWall OAuth 2.1 and OpenID Connect",
   "type": "library",
-  "license": "proprietary",
+  "license": "GPLv3",
   "require": {
     "php": ">=8.1",
     "ext-curl": "*"
