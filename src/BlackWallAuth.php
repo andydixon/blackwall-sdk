@@ -96,7 +96,7 @@ class BlackWallAuth
 
     /**
      * @param array<string,mixed> $query
-     * @param array{expected_nonce?:?string,validate_nonce?:bool} $options
+    * @param array{expected_nonce?:?string,validate_nonce?:bool,allow_missing_nonce?:bool} $options
      * @return array{
      *   tokens: array<string,mixed>,
      *   user: array{email:string,privilege_level:?int,role:?string,raw:array<string,mixed>},

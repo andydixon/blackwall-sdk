@@ -303,6 +303,66 @@ final class AuthClientTest extends TestCase
         self::assertNull($result->tokens->idToken);
     }
 
+    public function testHandleCallbackAllowsMissingNonceClaimWhenEnabled(): void
+    {
+        $_SESSION[AuthClient::STATE_SESSION_KEY] = 'state-1';
+        $_SESSION[AuthClient::CODE_VERIFIER_SESSION_KEY] = 'verifier-123';
+        $_SESSION[AuthClient::NONCE_SESSION_KEY] = 'expected-nonce';
+
+        $this->http->queuePost([
+            'status' => 200,
+            'body' => json_encode([
+                'access_token' => 'access-1',
+                'refresh_token' => 'refresh-1',
+                'id_token' => $this->makeJwt(['sub' => 'user-1']),
+                'token_type' => 'Bearer',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $this->http->queueGet([
+            'status' => 200,
+            'body' => '{"email":"tutor@example.com","privilege_level":2}',
+        ]);
+
+        $result = $this->client->handleCallback([
+            'code' => 'code-1',
+            'state' => 'state-1',
+        ], true, [
+            'allow_missing_nonce' => true,
+        ]);
+
+        self::assertSame('access-1', $result->tokens->accessToken);
+    }
+
+    public function testHandleCallbackAllowsMissingNonceClaimByDefault(): void
+    {
+        $_SESSION[AuthClient::STATE_SESSION_KEY] = 'state-1';
+        $_SESSION[AuthClient::CODE_VERIFIER_SESSION_KEY] = 'verifier-123';
+        $_SESSION[AuthClient::NONCE_SESSION_KEY] = 'expected-nonce';
+
+        $this->http->queuePost([
+            'status' => 200,
+            'body' => json_encode([
+                'access_token' => 'access-1',
+                'refresh_token' => 'refresh-1',
+                'id_token' => $this->makeJwt(['sub' => 'user-1']),
+                'token_type' => 'Bearer',
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $this->http->queueGet([
+            'status' => 200,
+            'body' => '{"email":"tutor@example.com","privilege_level":2}',
+        ]);
+
+        $result = $this->client->handleCallback([
+            'code' => 'code-1',
+            'state' => 'state-1',
+        ]);
+
+        self::assertSame('access-1', $result->tokens->accessToken);
+    }
+
     public function testHandleCallbackCanDisableNonceValidationTemporarily(): void
     {
         $_SESSION[AuthClient::STATE_SESSION_KEY] = 'state-1';

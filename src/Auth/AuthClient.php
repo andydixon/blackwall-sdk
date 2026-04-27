@@ -230,7 +230,7 @@ final class AuthClient
 
     /**
      * @param array<string, mixed> $query
-     * @param array{expected_nonce?:?string,validate_nonce?:bool} $options
+     * @param array{expected_nonce?:?string,validate_nonce?:bool,allow_missing_nonce?:bool} $options
      */
     public function handleCallback(array $query, bool $clearPkce = true, array $options = []): CallbackResult
     {
@@ -320,7 +320,7 @@ final class AuthClient
     }
 
     /**
-     * @param array{expected_nonce?:?string,validate_nonce?:bool} $options
+     * @param array{expected_nonce?:?string,validate_nonce?:bool,allow_missing_nonce?:bool} $options
      */
     private function maybeValidateNonce(TokenSet $tokens, array $options): void
     {
@@ -331,6 +331,21 @@ final class AuthClient
 
         $expectedNonce = $options['expected_nonce'] ?? ($_SESSION[self::NONCE_SESSION_KEY] ?? null);
         if (!is_string($expectedNonce) || $expectedNonce === '') {
+            return;
+        }
+
+        $allowMissingNonce = !isset($options['allow_missing_nonce']) || (bool) $options['allow_missing_nonce'];
+        if ($allowMissingNonce) {
+            $claims = $this->decodeJwtPayloadClaims($tokens->idToken);
+            $nonce = $claims['nonce'] ?? null;
+            if (!is_string($nonce) || $nonce === '') {
+                return;
+            }
+
+            if (!hash_equals($expectedNonce, $nonce)) {
+                throw new NonceMismatchException('The ID token nonce did not match the expected value', 'nonce_mismatch');
+            }
+
             return;
         }
 

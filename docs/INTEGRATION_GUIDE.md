@@ -135,6 +135,16 @@ $result = $client->handleCallback($_GET, true, [
 
 Use this only as a short-term bridge while the application is updated to persist and enforce nonce consistently.
 
+If your provider returns an `id_token` without the `nonce` claim, the SDK will allow missing nonce values by default while still enforcing a match when one is present. You can also set it explicitly:
+
+```php
+$result = $client->handleCallback($_GET, true, [
+    'allow_missing_nonce' => true,
+]);
+```
+
+Use this only after confirming the provider cannot include `nonce`, because it weakens replay protection for those tokens.
+
 ## 3. Single callback for multiple app roles
 
 Using one OAuth client and one callback URL is recommended.

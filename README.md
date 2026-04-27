@@ -126,6 +126,16 @@ If the provider does not return an `id_token`, callback handling remains gracefu
 
 Compatibility mode: if you have a temporary deployment constraint and cannot enforce nonce immediately, call `handleCallback($_GET, true, ['validate_nonce' => false])`. Treat this as a short-lived compatibility setting only.
 
+If your provider issues an `id_token` but omits the `nonce` claim, the SDK will accept missing nonce values by default while still enforcing a match when one is present. You can also set it explicitly:
+
+```php
+$result = $client->handleCallback($_GET, true, [
+  'allow_missing_nonce' => true,
+]);
+```
+
+Use this only when you have verified the provider cannot include `nonce`. It weakens replay protection for those tokens.
+
 ### JWT payload decoding helper
 
 Use `decodeJwtPayloadClaims()` when you need to inspect an `id_token` payload:
